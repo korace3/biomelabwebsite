@@ -1,4 +1,5 @@
 import streamlit as st
+from pathlib import Path
 
 def setup_page():
     # 페이지 기본 설정
@@ -7,6 +8,9 @@ def setup_page():
         page_icon="🧬",
         layout="wide"
     )
+    
+    # 로고 이미지 경로
+    logo_path = Path(__file__).parent / "assets" / "FullLogo_NoBuffer.png"
     
     # 커스텀 CSS 추가
     st.markdown("""
@@ -25,7 +29,7 @@ def setup_page():
         }
         .company-logo {
             width: 150px;
-            margin: 1rem 0;
+            margin-bottom: 2rem;
         }
         .chart-container {
             background: white;
@@ -43,7 +47,6 @@ def setup_page():
         </style>
     """, unsafe_allow_html=True)
     
-    # 회사 로고 추가
-    st.markdown("""
-        <img src="https://your-logo-url.com/logo.png" class="company-logo" alt="BiomeLab">
-    """, unsafe_allow_html=True) 
+    # 로고 이미지 표시
+    if logo_path.exists():
+        st.image(str(logo_path), width=150)
