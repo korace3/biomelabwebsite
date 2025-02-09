@@ -3,6 +3,11 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
+# 회사 테마 색상 정의
+THEME_COLOR = "#0066CC"  # 진한 파란색
+BACKGROUND_COLOR = "#1E1E1E"
+SECONDARY_COLOR = "#333333"
+
 def create_health_metric(icon, title, value, max_value=100):
     # 현대적인 선형 프로그레스 차트
     fig = go.Figure()
@@ -12,7 +17,7 @@ def create_health_metric(icon, title, value, max_value=100):
         type="line",
         x0=0, x1=100,
         y0=0, y1=0,
-        line=dict(color="#2D3436", width=8),
+        line=dict(color="#333333", width=12),  # 더 두꺼운 선
         layer="below"
     )
     
@@ -21,7 +26,7 @@ def create_health_metric(icon, title, value, max_value=100):
         type="line",
         x0=0, x1=value,
         y0=0, y1=0,
-        line=dict(color="#00B894", width=8),
+        line=dict(color=THEME_COLOR, width=12),  # 테마 색상 적용
         layer="above"
     )
     
@@ -30,13 +35,13 @@ def create_health_metric(icon, title, value, max_value=100):
         x=[value],
         y=[0],
         mode="markers",
-        marker=dict(size=20, color="#00B894", symbol="circle"),
+        marker=dict(size=24, color=THEME_COLOR, symbol="circle"),  # 더 큰 마커
         showlegend=False
     ))
     
     fig.update_layout(
-        height=80,
-        margin=dict(l=0, r=0, t=10, b=10),
+        height=100,  # 높이 증가
+        margin=dict(l=0, r=0, t=20, b=20),  # 여백 조정
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(range=[-5, 105], showgrid=False, zeroline=False, showline=False, showticklabels=False),
@@ -49,65 +54,73 @@ def show_disease_risk():
     # 스타일 정의
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     
     .health-metric {
         background: #1E1E1E;
-        border-radius: 15px;
-        padding: 20px;
-        margin: 10px 0;
-        border: 1px solid #333;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 15px 0;
+        border: 2px solid #333;
         transition: all 0.3s ease;
     }
     
     .health-metric:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 20px rgba(0, 102, 204, 0.2);
+        border-color: #0066CC;
     }
     
     .metric-header {
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
     
     .metric-icon {
-        width: 40px;
-        height: 40px;
-        margin-right: 15px;
+        width: 48px;
+        height: 48px;
+        margin-right: 20px;
         filter: invert(1);
     }
     
     .metric-title {
         color: #FFFFFF;
-        font-family: 'Inter', sans-serif;
-        font-size: 1.2em;
-        font-weight: 500;
+        font-family: 'Noto Sans KR', sans-serif;
+        font-size: 1.4em;
+        font-weight: 700;
     }
     
     .metric-value {
-        color: #00B894;
-        font-size: 1.5em;
-        font-weight: 600;
-        margin-top: 10px;
+        color: #0066CC;
+        font-size: 1.8em;
+        font-weight: 700;
+        margin-top: 15px;
     }
     
     .status-optimal {
-        color: #00B894;
+        color: #0066CC;
+    }
+    
+    .status-good {
+        color: #4D94FF;
     }
     
     .status-warning {
-        color: #FDCB6E;
-    }
-    
-    .status-alert {
-        color: #FF7675;
+        color: #FFA500;
     }
     
     .divider {
-        height: 1px;
+        height: 2px;
         background: #333;
-        margin: 30px 0;
+        margin: 40px 0;
+    }
+    
+    .expander-content {
+        background: #262626;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -179,15 +192,21 @@ def show_disease_risk():
             st.plotly_chart(fig, use_container_width=True)
             
             with st.expander("자세히 보기"):
-                st.markdown(metric['description'])
-                st.markdown(f"**현재 상태:** {metric['status'].title()}")
+                st.markdown(f"""
+                <div class="expander-content">
+                    <p>{metric['description']}</p>
+                    <p><strong>현재 상태:</strong> {metric['status'].title()}</p>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 if metric['value'] < 70:
                     st.warning("개선이 필요한 영역입니다")
-                    st.markdown("#### 권장 사항")
-                    st.markdown("• 맞춤형 영양 보충")
-                    st.markdown("• 생활습관 개선")
-                    st.markdown("• 정기적 모니터링")
+                    st.markdown("""
+                    #### 권장 사항
+                    • 맞춤형 영양 보충
+                    • 생활습관 개선
+                    • 정기적 모니터링
+                    """)
 
     # 종합 분석 섹션
     st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
