@@ -3,117 +3,161 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
-def calculate_risk_score(microbiome_data):
-    # 실제로는 더 복잡한 계산 로직이 들어갈 것입니다
-    return np.random.randint(0, 100)
-
-def create_gauge_chart(score, title):
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = score,
-        domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {'text': title},
-        gauge = {
-            'axis': {'range': [0, 100]},
-            'bar': {'color': "darkblue"},
-            'steps': [
-                {'range': [0, 30], 'color': "lightgreen"},
-                {'range': [30, 70], 'color': "yellow"},
-                {'range': [70, 100], 'color': "red"}
-            ],
-            'threshold': {
-                'line': {'color': "red", 'width': 4},
-                'thickness': 0.75,
-                'value': 90
-            }
-        }
+def create_slider_chart(title, value, status="Average"):
+    # 현대적인 슬라이더형 차트 생성
+    fig = go.Figure()
+    
+    # 배경 라인
+    fig.add_shape(
+        type="line",
+        x0=0, x1=100,
+        y0=0, y1=0,
+        line=dict(color="#E5E5E5", width=3),
+    )
+    
+    # 값 표시 라인
+    fig.add_shape(
+        type="line",
+        x0=0, x1=value,
+        y0=0, y1=0,
+        line=dict(color="#FF6B6B", width=3),
+    )
+    
+    # 마커 추가
+    fig.add_trace(go.Scatter(
+        x=[value],
+        y=[0],
+        mode="markers",
+        marker=dict(size=15, color="#FF6B6B", symbol="line-ns"),
+        showlegend=False
     ))
+    
+    # 레이아웃 설정
+    fig.update_layout(
+        height=100,
+        margin=dict(l=0, r=0, t=30, b=30),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(
+            range=[-5, 105],
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            showticklabels=False,
+        ),
+        yaxis=dict(
+            range=[-1, 1],
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            showticklabels=False,
+        ),
+    )
+    
     return fig
 
 def show_disease_risk():
-    st.title("🔬 질병 위험도 분석")
     st.markdown("""
-    마이크로바이옴 데이터를 기반으로 각종 질병의 위험도를 분석하고 예측합니다.
-    """)
-
-    # 전체 위험도 요약
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.subheader("주요 질병군 위험도")
-        
-        diseases = {
-            "대사성 질환": {
-                "score": calculate_risk_score(None),
-                "markers": ["인슐린 저항성", "지방대사 이상", "염증 지표"],
-                "description": "당뇨병, 비만 등과 관련된 위험도를 나타냅니다."
-            },
-            "소화기 질환": {
-                "score": calculate_risk_score(None),
-                "markers": ["장벽 투과성", "염증성 지표", "면역 반응"],
-                "description": "IBD, IBS 등 소화기 질환의 위험도를 나타냅니다."
-            },
-            "면역 질환": {
-                "score": calculate_risk_score(None),
-                "markers": ["면역 조절", "알레르기 반응", "자가면역 지표"],
-                "description": "알레르기, 자가면역질환 등의 위험도를 나타냅니다."
-            },
-            "정신건강": {
-                "score": calculate_risk_score(None),
-                "markers": ["세로토닌 생성", "스트레스 반응", "뇌-장 축"],
-                "description": "우울증, 불안장애 등 정신건강 관련 위험도입니다."
-            }
-        }
-
-    # 각 질병별 상세 분석
-    st.subheader("질병별 상세 분석")
-    
-    for disease, data in diseases.items():
-        with st.expander(f"{disease} - 위험도 {data['score']}"):
-            col1, col2 = st.columns([1, 2])
-            
-            with col1:
-                fig = create_gauge_chart(data['score'], disease)
-                st.plotly_chart(fig, use_container_width=True)
-            
-            with col2:
-                st.markdown("#### 주요 마이크로바이옴 지표")
-                for marker in data['markers']:
-                    st.markdown(f"- {marker}")
-                
-                st.markdown("#### 설명")
-                st.markdown(data['description'])
-                
-                if data['score'] > 70:
-                    st.warning("⚠️ 고위험군에 속합니다. 전문의와 상담을 권장합니다.")
-                elif data['score'] > 30:
-                    st.info("ℹ️ 중간 위험군입니다. 생활습관 개선을 권장합니다.")
-                else:
-                    st.success("✅ 정상 범위입니다. 현재 상태를 유지하세요.")
-
-    # 개선 권장사항
-    st.subheader("💡 맞춤형 개선 방안")
-    recommendations = {
-        "식이 권장사항": [
-            "식이섬유가 풍부한 음식 섭취",
-            "프로바이오틱스가 풍부한 발효식품 섭취",
-            "항산화 물질이 풍부한 채소와 과일 섭취"
-        ],
-        "생활습관 개선": [
-            "규칙적인 운동",
-            "충분한 수면",
-            "스트레스 관리"
-        ],
-        "정기검진": [
-            "6개월 주기로 마이크로바이옴 검사 권장",
-            "연 1회 이상 건강검진 권장",
-            "고위험군의 경우 3개월 주기 검사 권장"
-        ]
+    <style>
+    .main {
+        background-color: #FFFFFF;
     }
+    .metric-container {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status-text {
+        color: #666;
+        font-size: 0.8em;
+    }
+    .metric-title {
+        font-size: 1.2em;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    .stMarkdown {
+        padding: 0;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    for category, items in recommendations.items():
-        with st.expander(category):
-            for item in items:
-                st.markdown(f"- {item}")
+    st.title("건강 위험도 분석")
+    
+    metrics = {
+        "장 건강 지수": {
+            "value": 75,
+            "status": "Average",
+            "description": "전반적인 장 건강 상태를 나타내는 지표입니다."
+        },
+        "염증 활성도": {
+            "value": 45,
+            "status": "Not optimal",
+            "description": "체내 염증 반응의 정도를 나타냅니다."
+        },
+        "대사 기능": {
+            "value": 85,
+            "status": "Optimal",
+            "description": "영양소 대사와 에너지 생산 능력을 나타냅니다."
+        },
+        "소화 효율": {
+            "value": 65,
+            "status": "Average",
+            "description": "음식물의 소화 및 흡수 효율을 나타냅니다."
+        },
+        "장벽 건강도": {
+            "value": 55,
+            "status": "Not optimal",
+            "description": "장벽의 무결성과 보호 기능을 나타냅니다."
+        }
+    }
+    
+    for metric, data in metrics.items():
+        st.markdown(f"""
+        <div class="metric-container">
+            <div class="metric-title">{metric}</div>
+            <div class="status-text">{data['status']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        fig = create_slider_chart(metric, data['value'], data['status'])
+        st.plotly_chart(fig, use_container_width=True)
+        
+        with st.expander("자세히 보기"):
+            st.markdown(data['description'])
+            
+            if data['value'] < 50:
+                st.warning("⚠️ 개선이 필요한 영역입니다.")
+                st.markdown("#### 개선 방안")
+                st.markdown("- 식단 조절을 통한 개선")
+                st.markdown("- 생활습관 개선")
+                st.markdown("- 정기적인 모니터링")
+            elif data['value'] < 75:
+                st.info("ℹ️ 정상이지만 개선의 여지가 있습니다.")
+            else:
+                st.success("✅ 최적의 상태입니다.")
+
+    # 종합 분석 및 권장사항
+    st.markdown("### 💡 맞춤형 개선 방안")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        #### 즉시 실천 가능한 조치
+        - 식이섬유가 풍부한 식단
+        - 발효식품 섭취 증가
+        - 규칙적인 운동
+        """)
+    
+    with col2:
+        st.markdown("""
+        #### 장기적 관리 방안
+        - 정기적인 검사
+        - 스트레스 관리
+        - 수면 관리
+        """)
 
 if __name__ == "__main__":
     show_disease_risk() 
